@@ -1,0 +1,42 @@
+.tooltip-columns {
+  margin: 4px;
+}
+
+.tooltip-container {
+  display: flex;
+  column-gap: 8px;
+  padding: 4px 16px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tooltip-title {
+  margin: 8px 0 0 0;
+}
+
+.tooltip-values {
+  display: flex;
+}
+
+.tooltip-row {
+  margin: 4px 0;
+}
+
+.chart-container {
+  height: 500px;
+  width: 650px;
+
+  margin: 50px;
+}
+
+.pie-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin: 50px;
+
+  height: 100%;
+  width: 100%;
+}

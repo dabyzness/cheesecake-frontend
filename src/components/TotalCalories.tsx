@@ -1,58 +1,127 @@
 import { useState } from "react";
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  PieProps,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
 import { PieChartData } from "../App";
+import { ResponsivePie } from "@nivo/pie";
+import { text } from "stream/consumers";
+
+// Component to display in center of Pie chart
+const CenteredMetric = ({ dataWithArc, centerX, centerY }: any) => {
+  let total = 0;
+  dataWithArc.forEach((datum: PieChartData) => {
+    total += datum.value;
+  });
+
+  return (
+    <text
+      x={centerX}
+      y={centerY}
+      textAnchor="middle"
+      dominantBaseline="central"
+      style={{
+        fontSize: "48px",
+        fontWeight: 600,
+      }}
+    >
+      {total}
+    </text>
+  );
+};
+
+const CustomToolTip = ({ datum }: any) => {
+  return (
+    <div
+      className="tooltip-container"
+      style={{ backgroundColor: "#222222", display: "flex" }}
+    >
+      <h4 className="tooltip-title" style={{ color: datum.data.color }}>
+        {datum.data.id}
+      </h4>
+      <div className="tooltip-values">
+        <div className="tooltip-columns">
+          {datum.data?.children && (
+            <>
+              {Object.keys(datum.data.children).map((child) => (
+                <p className="tooltip-row" style={{ color: datum.data.color }}>
+                  {child}
+                </p>
+              ))}
+              <p
+                className="tooltip-row"
+                style={{
+                  color: datum.data.color,
+                  borderBottom: "2px solid",
+                  width: "100%",
+                }}
+              ></p>
+            </>
+          )}
+
+          <p className="tooltip-row" style={{ color: datum.data.color }}>
+            Total:
+          </p>
+        </div>
+        <div className="tooltip-columns" style={{ textAlign: "right" }}>
+          {datum.data?.children && (
+            <>
+              {Object.values(datum.data.children).map((child) => (
+                <p className="tooltip-row" style={{ color: datum.data.color }}>
+                  {child as number} cal
+                </p>
+              ))}
+              <p
+                className="tooltip-row"
+                style={{
+                  color: datum.data.color,
+                  borderBottom: "2px solid",
+                  width: "100%",
+                }}
+              ></p>
+            </>
+          )}
+          <p className="tooltip-row" style={{ color: datum.data.color }}>
+            {datum.data.value} cal
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface TotalCaloriesProps {
   data: PieChartData[];
+  title: string;
 }
 
 function TotalCalories(props: TotalCaloriesProps) {
-  const { data } = props;
-  const [hover, setHover] = useState<string | null>(null);
-
-  // console.log(data.reduce((total, curr) => (total += curr.value), 0));
-
-  function handleMouseEnter(o: any) {
-    console.log(o);
-  }
+  const { data, title } = props;
 
   return (
-    <div>
-      <ResponsiveContainer height={500} width="100%">
-        <PieChart width={400} height={400}>
-          <Pie
-            data={data}
-            dataKey="value"
-            cx="50%"
-            cy="50%"
-            paddingAngle={1}
-            onMouseEnter={(o) => {
-              handleMouseEnter(o);
-            }}
-            // legendType="line"
-            label
-          >
-            {data.map((entry, i) => (
-              <Cell key={`cell-${i}`} fill={hover || entry.fill} />
-            ))}
-          </Pie>
-          <Legend
-            layout="vertical"
-            align="right"
-            verticalAlign="middle"
-            iconType="circle"
-          />
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="pie-chart">
+      <h2>{title}</h2>
+      <ResponsivePie
+        data={data}
+        innerRadius={0.6}
+        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        sortByValue={true}
+        padAngle={1}
+        enableArcLabels={false}
+        arcLinkLabelsColor={{ from: "color" }}
+        arcLinkLabelsSkipAngle={10}
+        arcLinkLabelsThickness={3}
+        cornerRadius={4}
+        colors={{ datum: "data.color" }}
+        activeOuterRadiusOffset={8}
+        activeInnerRadiusOffset={2}
+        motionConfig="wobbly"
+        transitionMode="startAngle"
+        tooltip={CustomToolTip}
+        layers={[
+          "arcs",
+          "arcLabels",
+          "arcLinkLabels",
+          "legends",
+          CenteredMetric,
+        ]}
+      />
     </div>
   );
 }

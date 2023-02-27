@@ -11,9 +11,10 @@ import {
 } from "./data/cheesecakeMenu";
 
 export interface PieChartData {
-  name: string;
+  id: string;
   value: number;
-  fill: string;
+  color: string;
+  children?: { [key: string]: number };
 }
 
 const colors: string[] = [
@@ -44,26 +45,32 @@ function computeTotal(data: Menu, field: "price" | "calories") {
       );
 
       return {
-        name: category,
+        id: category,
         value: field === "calories" ? total : parseFloat(total.toFixed(2)),
-        fill: colors[i],
+        color: colors[i],
       };
     } else {
-      const total: number = Object.values(
+      const children: { [key: string]: number } = Object.entries(
         (data.menu[category] as SubCategory).subcategories
-      ).reduce(
-        (total, curr) =>
-          (total += curr.reduce(
-            (total, curr) => (total += Object.values(curr)[0][field]),
-            0
-          )),
+      ).reduce((total, curr, i) => {
+        console.log(curr[0]);
+        const totalValue = curr[1].reduce(
+          (total, curr) => (total += Object.values(curr)[0][field]),
+          0
+        );
+        return { ...total, [curr[0]]: totalValue };
+      }, {});
+
+      const total = Object.values(children).reduce(
+        (total, curr) => (total += curr),
         0
       );
 
       return {
-        name: category,
+        id: category,
         value: field === "calories" ? total : parseFloat(total.toFixed(2)),
-        fill: colors[i],
+        color: colors[i],
+        children,
       };
     }
   });
@@ -72,7 +79,13 @@ function computeTotal(data: Menu, field: "price" | "calories") {
 function App() {
   return (
     <div className="App">
-      <TotalCalories data={computeTotal(cheesecakeMenu, "calories")} />
+      <div className="chart-container">
+        <TotalCalories
+          data={computeTotal(cheesecakeMenu, "calories")}
+          title="Total Calories"
+        />
+      </div>
+
       {/* <TotalCost data={computeTotal(cheesecakeMenu, "price")} /> */}
     </div>
   );
