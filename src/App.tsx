@@ -22,23 +22,23 @@ export interface PieChartData {
 
 export interface ScatterPlotData {
   id: string;
-  data: { x: number; y: number }[];
+  data: { x: number; y: number; id: string }[];
   color: string;
 }
 
 function formatScatterPlot(data: Menu): ScatterPlotData[] {
   return Object.keys(data.menu).map((category, i) => {
     if (isItemArr(data.menu[category])) {
-      const categoryData: { x: number; y: number }[] = (
+      const categoryData: { x: number; y: number; id: string }[] = (
         data.menu[category] as Item[]
       ).reduce((total, curr) => {
         const price = Object.values(curr)[0].price;
         const calories = Object.values(curr)[0].calories;
-        total.push({ x: price, y: calories });
+        total.push({ x: price, y: calories, id: Object.keys(curr)[0] });
         return total;
         // No clue why I had to assert the type of the array.
         // The array kept saying --> type: never[]
-      }, [] as { x: number; y: number }[]);
+      }, [] as { x: number; y: number; id: string }[]);
 
       return { id: category, data: categoryData, color: colors[i] };
     }
@@ -49,16 +49,16 @@ function formatScatterPlot(data: Menu): ScatterPlotData[] {
       const totalValue = curr[1].reduce((total, curr) => {
         const price = Object.values(curr)[0].price;
         const calories = Object.values(curr)[0].calories;
-        total.push({ x: price, y: calories });
+        total.push({ x: price, y: calories, id: Object.keys(curr)[0] });
         return total;
         // No clue why I had to assert the type of the array.
         // The array kept saying --> type: never[]
-      }, [] as { x: number; y: number }[]);
+      }, [] as { x: number; y: number; id: string }[]);
 
       total.push(...totalValue);
 
       return total;
-    }, [] as { x: number; y: number }[]);
+    }, [] as { x: number; y: number; id: string }[]);
 
     return { id: category, data: categoryData, color: colors[i] };
   });
@@ -144,9 +144,10 @@ function computeTotal(data: Menu, field: ViewValues) {
 
 function App() {
   const [value, setValue] = useState<ViewValues>("price");
+  const [scatter, setScatter] = useState<boolean>(false);
   return (
     <div className="App">
-      {/* <select
+      <select
         name="view-by"
         id="view-by"
         onChange={(e) => {
@@ -156,16 +157,20 @@ function App() {
         <option value="price">Price</option>
         <option value="calories">Calories</option>
       </select>
-      <div className="chart-container">
-        <TotalCalories
-          data={computeTotal(cheesecakeMenu, value)}
-          title={`Total ${value[0].toUpperCase() + value.slice(1)}`}
-        />
-      </div> */}
 
+      <button onClick={(e) => setScatter(!scatter)}>Price vs Calories</button>
       <div className="chart-container">
-        <ScatterPlot data={formatScatterPlot(cheesecakeMenu)} />
+        {scatter && <ScatterPlot data={formatScatterPlot(cheesecakeMenu)} />}
+
+        {!scatter && (
+          <TotalCalories
+            data={computeTotal(cheesecakeMenu, value)}
+            title={`Total ${value[0].toUpperCase() + value.slice(1)}`}
+          />
+        )}
       </div>
+
+      <div className="chart-container"></div>
     </div>
   );
 }

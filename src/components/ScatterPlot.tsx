@@ -1,14 +1,45 @@
-import {
-  ResponsiveScatterPlot,
-  ScatterPlotLayerProps,
-  ScatterPlotNodeProps,
-} from "@nivo/scatterplot";
-import { useCallback, useEffect, useState } from "react";
-import { createSemanticDiagnosticsBuilderProgram } from "typescript";
+import { ResponsiveScatterPlot } from "@nivo/scatterplot";
+import { useState, MouseEvent } from "react";
+
 import { ScatterPlotData } from "../App";
 import { animated } from "@react-spring/web";
-import { useTooltip } from "@nivo/tooltip";
-import { createElement } from "react";
+
+const ScatterTooltip = ({ node }: any) => {
+  return (
+    <div
+      className="tooltip-container"
+      style={{ backgroundColor: "#222222", display: "flex" }}
+    >
+      <h4 className="tooltip-title" style={{ color: node.color }}>
+        {node.data.id}
+      </h4>
+      <div className="tooltip-values">
+        <div className="tooltip-columns">
+          <p className="tooltip-row" style={{ color: node.color }}>
+            Category
+          </p>
+          <p className="tooltip-row" style={{ color: node.color }}>
+            Price
+          </p>
+          <p className="tooltip-row" style={{ color: node.color }}>
+            Calories
+          </p>
+        </div>
+        <div className="tooltip-columns" style={{ textAlign: "right" }}>
+          <p className="tooltip-row" style={{ color: node.color }}>
+            {node.serieId}
+          </p>
+          <p className="tooltip-row" style={{ color: node.color }}>
+            ${node.data.x}
+          </p>
+          <p className="tooltip-row" style={{ color: node.color }}>
+            {node.data.y}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface ScatterPlotProps {
   data: ScatterPlotData[];
@@ -54,10 +85,17 @@ function ScatterPlot(props: ScatterPlotProps) {
     );
   };
 
+  const handleInputClick = (e: MouseEvent) => {
+    const index = parseInt(e.currentTarget.id.split("-")[0]);
+    setIsClicked(isClicked.map((item, i) => (i === index ? !item : item)));
+  };
+
   return (
-    <div className="pie-chart">
+    <div className="scatter-chart">
       <ResponsiveScatterPlot
         data={data}
+        animate={true}
+        motionConfig="gentle"
         margin={{ top: 60, right: 140, bottom: 70, left: 90 }}
         colors={(node) => {
           return data.find((item) => item.id === node.serieId)?.color as string;
@@ -75,6 +113,7 @@ function ScatterPlot(props: ScatterPlotProps) {
           "annotations",
         ]}
         nodeComponent={RenderNode}
+        tooltip={ScatterTooltip}
         legends={[
           {
             anchor: "bottom-right",
@@ -84,7 +123,7 @@ function ScatterPlot(props: ScatterPlotProps) {
             translateY: 0,
             itemWidth: 100,
             itemHeight: 12,
-            itemsSpacing: 5,
+            itemsSpacing: 12,
             itemDirection: "left-to-right",
             symbolSize: 12,
             symbolShape: "circle",
@@ -92,7 +131,9 @@ function ScatterPlot(props: ScatterPlotProps) {
               {
                 on: "hover",
                 style: {
-                  itemOpacity: 1,
+                  itemOpacity: 6,
+                  symbolSize: 16,
+                  symbolBorderWidth: 10,
                 },
               },
             ],
@@ -100,6 +141,18 @@ function ScatterPlot(props: ScatterPlotProps) {
           },
         ]}
       />
+      <div className="scatter-checkbox">
+        {data.map((item, i) => (
+          <input
+            type="checkbox"
+            value={item.id}
+            checked={isClicked[i]}
+            id={`${i}-category`}
+            style={{ margin: "0", padding: "0" }}
+            onClick={handleInputClick}
+          />
+        ))}
+      </div>
     </div>
   );
 }
