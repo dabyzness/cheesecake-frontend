@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { PieChartData } from "../App";
+import { PieChartData, ViewValues } from "../App";
 import { ResponsivePie } from "@nivo/pie";
-import { text } from "stream/consumers";
 
 // Component to display in center of Pie chart
 const CenteredMetric = ({ dataWithArc, centerX, centerY }: any) => {
@@ -21,7 +19,7 @@ const CenteredMetric = ({ dataWithArc, centerX, centerY }: any) => {
         fontWeight: 600,
       }}
     >
-      {total}
+      {dataWithArc[0].data?.type === "price" ? `$${total.toFixed(2)}` : total}
     </text>
   );
 };
@@ -64,7 +62,9 @@ const CustomToolTip = ({ datum }: any) => {
             <>
               {Object.values(datum.data.children).map((child) => (
                 <p className="tooltip-row" style={{ color: datum.data.color }}>
-                  {child as number} cal
+                  {datum.data?.type === "price"
+                    ? `$${((child as any).value as number).toFixed(2)}`
+                    : `${(child as any).value} cal`}
                 </p>
               ))}
               <p
@@ -78,7 +78,9 @@ const CustomToolTip = ({ datum }: any) => {
             </>
           )}
           <p className="tooltip-row" style={{ color: datum.data.color }}>
-            {datum.data.value} cal
+            {datum.data?.type === "price"
+              ? `$${datum.data.value.toFixed(2)}`
+              : `${datum.data.value} cal`}
           </p>
         </div>
       </div>

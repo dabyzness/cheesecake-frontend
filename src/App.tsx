@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { TotalCalories } from "./components/TotalCalories";
 import { TotalCost } from "./components/TotalCost";
@@ -14,7 +14,9 @@ export interface PieChartData {
   id: string;
   value: number;
   color: string;
-  children?: { [key: string]: number };
+  type: ViewValues;
+  numItems: number;
+  children?: { [key: string]: { value: number; numItems: number } };
 }
 
 const colors: string[] = [
@@ -36,7 +38,9 @@ const colors: string[] = [
   "#ce0058",
 ];
 
-function computeTotal(data: Menu, field: "price" | "calories") {
+export type ViewValues = "price" | "calories";
+
+function computeTotal(data: Menu, field: ViewValues) {
   return Object.keys(data.menu).map((category, i) => {
     if (isItemArr(data.menu[category])) {
       const total: number = (data.menu[category] as Item[]).reduce(
@@ -44,25 +48,40 @@ function computeTotal(data: Menu, field: "price" | "calories") {
         0
       );
 
+      const numItems: number = (data.menu[category] as Item[]).length;
+
       return {
         id: category,
         value: field === "calories" ? total : parseFloat(total.toFixed(2)),
         color: colors[i],
+        type: field,
+        numItems,
       };
     } else {
-      const children: { [key: string]: number } = Object.entries(
-        (data.menu[category] as SubCategory).subcategories
-      ).reduce((total, curr, i) => {
-        console.log(curr[0]);
-        const totalValue = curr[1].reduce(
-          (total, curr) => (total += Object.values(curr)[0][field]),
-          0
-        );
-        return { ...total, [curr[0]]: totalValue };
-      }, {});
+      const children: { [key: string]: { value: number; numItems: number } } =
+        Object.entries(
+          (data.menu[category] as SubCategory).subcategories
+        ).reduce((total, curr, i) => {
+          const totalValue = curr[1].reduce(
+            (total, curr) => (total += Object.values(curr)[0][field]),
+            0
+          );
+
+          const child: { [key: string]: number; numItems: number } = {
+            value: totalValue,
+            numItems: curr[1].length,
+          };
+
+          return { ...total, [curr[0]]: child };
+        }, {});
 
       const total = Object.values(children).reduce(
-        (total, curr) => (total += curr),
+        (total, curr) => (total += curr.value),
+        0
+      );
+
+      const numItems: number = Object.values(children).reduce(
+        (total, curr) => (total += curr.numItems),
         0
       );
 
@@ -71,22 +90,33 @@ function computeTotal(data: Menu, field: "price" | "calories") {
         value: field === "calories" ? total : parseFloat(total.toFixed(2)),
         color: colors[i],
         children,
+        numItems,
+        type: field,
       };
     }
   });
 }
 
 function App() {
+  const [value, setValue] = useState<ViewValues>("price");
   return (
     <div className="App">
+      <select
+        name="view-by"
+        id="view-by"
+        onChange={(e) => {
+          setValue(e.target.value as ViewValues);
+        }}
+      >
+        <option value="price">Price</option>
+        <option value="calories">Calories</option>
+      </select>
       <div className="chart-container">
         <TotalCalories
-          data={computeTotal(cheesecakeMenu, "calories")}
-          title="Total Calories"
+          data={computeTotal(cheesecakeMenu, value)}
+          title={`Total ${value[0].toUpperCase() + value.slice(1)}`}
         />
       </div>
-
-      {/* <TotalCost data={computeTotal(cheesecakeMenu, "price")} /> */}
     </div>
   );
 }
