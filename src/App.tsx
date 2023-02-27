@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "./App.css";
+import { ScatterPlot } from "./components/ScatterPlot";
 import { TotalCalories } from "./components/TotalCalories";
-import { TotalCost } from "./components/TotalCost";
 import {
   cheesecakeMenu,
   isItemArr,
   Item,
+  ItemInfo,
   Menu,
   SubCategory,
 } from "./data/cheesecakeMenu";
@@ -17,6 +18,50 @@ export interface PieChartData {
   type: ViewValues;
   numItems: number;
   children?: { [key: string]: { value: number; numItems: number } };
+}
+
+export interface ScatterPlotData {
+  id: string;
+  data: { x: number; y: number }[];
+  color: string;
+}
+
+function formatScatterPlot(data: Menu): ScatterPlotData[] {
+  return Object.keys(data.menu).map((category, i) => {
+    if (isItemArr(data.menu[category])) {
+      const categoryData: { x: number; y: number }[] = (
+        data.menu[category] as Item[]
+      ).reduce((total, curr) => {
+        const price = Object.values(curr)[0].price;
+        const calories = Object.values(curr)[0].calories;
+        total.push({ x: price, y: calories });
+        return total;
+        // No clue why I had to assert the type of the array.
+        // The array kept saying --> type: never[]
+      }, [] as { x: number; y: number }[]);
+
+      return { id: category, data: categoryData, color: colors[i] };
+    }
+
+    const categoryData = Object.entries(
+      (data.menu[category] as SubCategory).subcategories
+    ).reduce((total, curr, i) => {
+      const totalValue = curr[1].reduce((total, curr) => {
+        const price = Object.values(curr)[0].price;
+        const calories = Object.values(curr)[0].calories;
+        total.push({ x: price, y: calories });
+        return total;
+        // No clue why I had to assert the type of the array.
+        // The array kept saying --> type: never[]
+      }, [] as { x: number; y: number }[]);
+
+      total.push(...totalValue);
+
+      return total;
+    }, [] as { x: number; y: number }[]);
+
+    return { id: category, data: categoryData, color: colors[i] };
+  });
 }
 
 const colors: string[] = [
@@ -101,7 +146,7 @@ function App() {
   const [value, setValue] = useState<ViewValues>("price");
   return (
     <div className="App">
-      <select
+      {/* <select
         name="view-by"
         id="view-by"
         onChange={(e) => {
@@ -116,6 +161,10 @@ function App() {
           data={computeTotal(cheesecakeMenu, value)}
           title={`Total ${value[0].toUpperCase() + value.slice(1)}`}
         />
+      </div> */}
+
+      <div className="chart-container">
+        <ScatterPlot data={formatScatterPlot(cheesecakeMenu)} />
       </div>
     </div>
   );
