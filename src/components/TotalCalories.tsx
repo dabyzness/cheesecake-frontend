@@ -38,7 +38,11 @@ const CustomToolTip = ({ datum }: any) => {
           {datum.data?.children && (
             <>
               {Object.keys(datum.data.children).map((child) => (
-                <p className="tooltip-row" style={{ color: datum.data.color }}>
+                <p
+                  key={`${child}`}
+                  className="tooltip-row"
+                  style={{ color: datum.data.color }}
+                >
                   {child}
                 </p>
               ))}
@@ -61,7 +65,11 @@ const CustomToolTip = ({ datum }: any) => {
           {datum.data?.children && (
             <>
               {Object.values(datum.data.children).map((child) => (
-                <p className="tooltip-row" style={{ color: datum.data.color }}>
+                <p
+                  key={(child as any).id}
+                  className="tooltip-row"
+                  style={{ color: datum.data.color }}
+                >
                   {datum.data?.type === "price"
                     ? `$${((child as any).value as number).toFixed(2)}`
                     : `${(child as any).value} cal`}

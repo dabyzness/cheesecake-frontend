@@ -161,6 +161,7 @@ function ScatterPlot(props: ScatterPlotProps) {
         <div className="scatter-checkbox">
           {data.map((item, i) => (
             <input
+              key={`${item.id}-legend`}
               type="checkbox"
               value={item.id}
               checked={isClicked[i]}
