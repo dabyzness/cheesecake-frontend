@@ -1,3 +1,4 @@
+import { Button, InputLabel, MenuItem, Select } from "@mui/material";
 import React, { useState } from "react";
 import "./App.css";
 import { ScatterPlot } from "./components/ScatterPlot";
@@ -148,31 +149,28 @@ function App() {
   const [scatter, setScatter] = useState<boolean>(false);
   return (
     <div className="App">
-      <select
-        name="view-by"
-        id="view-by"
-        onChange={(e) => {
-          setValue(e.target.value as ViewValues);
-        }}
-      >
-        <option value="price">Price</option>
-        <option value="calories">Calories</option>
-      </select>
-
-      <button onClick={(e) => setScatter(!scatter)}>Price vs Calories</button>
-      <div className="chart-container">
-        {scatter && <ScatterPlot data={formatScatterPlot(cheesecakeMenu)} />}
-
-        {!scatter && (
-          <TotalCalories
-            data={computeTotal(cheesecakeMenu, value)}
-            title={`Total ${value[0].toUpperCase() + value.slice(1)}`}
-          />
-        )}
+      <div className="app-heading">
+        <h1>The Cheesecake FACTory</h1>
       </div>
-
-      <div className="chart-container">
-        <TopThree data={formatScatterPlot(cheesecakeMenu)} />
+      <div className="app-body">
+        <div className="chart-container">
+          <div className="row">
+            <TotalCalories
+              data={computeTotal(cheesecakeMenu, "price")}
+              title={`Total Cost of Menu`}
+            />
+            <TotalCalories
+              data={computeTotal(cheesecakeMenu, "calories")}
+              title={`Total Calories of Menu`}
+            />
+          </div>
+          <div className="row">
+            <ScatterPlot data={formatScatterPlot(cheesecakeMenu)} />
+          </div>
+          <div className="row">
+            <TopThree data={formatScatterPlot(cheesecakeMenu)} />
+          </div>
+        </div>
       </div>
     </div>
   );

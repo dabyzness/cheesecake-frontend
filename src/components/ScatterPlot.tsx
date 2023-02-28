@@ -1,5 +1,5 @@
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, ChangeEvent } from "react";
 
 import { ScatterPlotData } from "../App";
 import { animated } from "@react-spring/web";
@@ -85,73 +85,91 @@ function ScatterPlot(props: ScatterPlotProps) {
     );
   };
 
-  const handleInputClick = (e: MouseEvent) => {
+  const handleInputClick = (e: ChangeEvent<HTMLInputElement>) => {
     const index = parseInt(e.currentTarget.id.split("-")[0]);
     setIsClicked(isClicked.map((item, i) => (i === index ? !item : item)));
   };
 
   return (
-    <div className="scatter-chart">
-      <ResponsiveScatterPlot
-        data={data}
-        animate={true}
-        motionConfig="gentle"
-        margin={{ top: 60, right: 140, bottom: 70, left: 90 }}
-        colors={(node) => {
-          return data.find((item) => item.id === node.serieId)?.color as string;
-        }}
-        useMesh={false}
-        xScale={{ type: "linear", min: 5, max: 40 }}
-        yScale={{ type: "linear", min: 0, max: 2800 }}
-        layers={[
-          "grid",
-          "axes",
-          "nodes",
-          "markers",
-          "mesh",
-          "legends",
-          "annotations",
-        ]}
-        nodeComponent={RenderNode}
-        tooltip={ScatterTooltip}
-        legends={[
-          {
-            anchor: "bottom-right",
-            direction: "column",
-            justify: false,
-            translateX: 130,
-            translateY: 0,
-            itemWidth: 100,
-            itemHeight: 12,
-            itemsSpacing: 12,
-            itemDirection: "left-to-right",
-            symbolSize: 12,
-            symbolShape: "circle",
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemOpacity: 6,
-                  symbolSize: 16,
-                  symbolBorderWidth: 10,
+    <div className="scatter-chart" style={{ flexDirection: "column" }}>
+      <h2 className="pie-title">Price vs. Calories</h2>
+      <div className="scatter-chart">
+        <ResponsiveScatterPlot
+          data={data}
+          animate={true}
+          motionConfig="gentle"
+          margin={{ top: 60, right: 140, bottom: 70, left: 90 }}
+          colors={(node) => {
+            return data.find((item) => item.id === node.serieId)
+              ?.color as string;
+          }}
+          useMesh={false}
+          xScale={{ type: "linear", min: 5, max: 40 }}
+          axisBottom={{
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: "Price ($)",
+            legendPosition: "middle",
+            legendOffset: 46,
+          }}
+          yScale={{ type: "linear", min: 0, max: 2800 }}
+          axisLeft={{
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: "Calories",
+            legendPosition: "middle",
+            legendOffset: -60,
+          }}
+          layers={[
+            "grid",
+            "axes",
+            "nodes",
+            "markers",
+            "mesh",
+            "legends",
+            "annotations",
+          ]}
+          nodeComponent={RenderNode}
+          tooltip={ScatterTooltip}
+          legends={[
+            {
+              anchor: "bottom-right",
+              direction: "column",
+              justify: false,
+              translateX: 130,
+              translateY: 0,
+              itemWidth: 100,
+              itemHeight: 12,
+              itemsSpacing: 12,
+              itemDirection: "left-to-right",
+              symbolSize: 12,
+              symbolShape: "circle",
+              effects: [
+                {
+                  on: "hover",
+                  style: {
+                    itemOpacity: 6,
+                    symbolSize: 16,
+                    symbolBorderWidth: 10,
+                  },
                 },
-              },
-            ],
-            onClick: handleClick,
-          },
-        ]}
-      />
-      <div className="scatter-checkbox">
-        {data.map((item, i) => (
-          <input
-            type="checkbox"
-            value={item.id}
-            checked={isClicked[i]}
-            id={`${i}-category`}
-            style={{ margin: "0", padding: "0" }}
-            onClick={handleInputClick}
-          />
-        ))}
+              ],
+              onClick: handleClick,
+            },
+          ]}
+        />
+        <div className="scatter-checkbox">
+          {data.map((item, i) => (
+            <input
+              type="checkbox"
+              value={item.id}
+              checked={isClicked[i]}
+              id={`${i}-category`}
+              style={{ margin: "0", padding: "0" }}
+              onChange={handleInputClick}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

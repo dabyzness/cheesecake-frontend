@@ -1,3 +1,40 @@
+@font-face {
+  font-family: Windsor;
+  src: url("/public/fonts/Windsor\ BOLD.ttf");
+}
+
+body {
+  background-color: #fdf8ea;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* height: 100vh; */
+  width: 100%;
+  font-family: Windsor;
+}
+
+h1 {
+  font-family: Windsor;
+  font-size: 54px;
+}
+
+.app-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 100%; */
+}
+
+.chart-selection {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
 .tooltip-columns {
   margin: 4px;
 }
@@ -23,10 +60,13 @@
 }
 
 .chart-container {
+  min-height: 500px;
   height: 500px;
-  width: 650px;
+  width: 100%;
+  max-width: 1000px;
+  /* min-width: 70%; */
 
-  margin: 50px;
+  margin: 50px 0;
 }
 
 .pie-chart {
@@ -35,10 +75,11 @@
   justify-content: center;
   align-items: center;
 
-  margin: 50px;
+  /* margin: 50px; */
 
   height: 100%;
-  width: 100%;
+  /* width: 50%; */
+  width: 500px;
 }
 
 .scatter-chart {
@@ -47,7 +88,7 @@
   justify-content: center;
   align-items: center;
 
-  margin: 50px;
+  /* margin: 50px; */
 
   height: 100%;
   width: 100%;
@@ -59,4 +100,18 @@
   margin-left: 8px;
   row-gap: 11px;
   margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.pie-title {
+  margin: 0;
+  font-size: 28px;
 }

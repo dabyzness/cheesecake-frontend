@@ -98,7 +98,7 @@ function TotalCalories(props: TotalCaloriesProps) {
 
   return (
     <div className="pie-chart">
-      <h2>{title}</h2>
+      <h2 className="pie-title">{title}</h2>
       <ResponsivePie
         data={data}
         innerRadius={0.6}

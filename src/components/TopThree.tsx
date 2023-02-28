@@ -1,5 +1,9 @@
 import {
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -88,7 +92,7 @@ function TopThree(props: TopThreeProps) {
     return sorted.slice(0, 5);
   }
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (e: SelectChangeEvent) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -104,71 +108,101 @@ function TopThree(props: TopThreeProps) {
   }, [formData]);
 
   return (
-    <div>
-      <form action="">
-        <label htmlFor="category">Category: </label>
-        <select
-          name="category"
-          id="category"
-          value={formData.category}
-          onChange={handleChange}
-        >
-          <option value="all">All Items</option>
-          <option value="gluten-free">Gluten Free</option>
-          {Object.values(data).map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.id}
-            </option>
-          ))}
-        </select>
-
-        <label htmlFor="direction">Direction: </label>
-        <select
-          name="direction"
-          id="direction"
-          value={formData.direction}
-          onChange={handleChange}
-          disabled={formData.category === "gluten-free"}
-        >
-          <option value="1">Highest</option>
-          <option value="-1">Lowest</option>
-        </select>
-
-        <label htmlFor="property">Property: </label>
-        <select
-          name="property"
-          id="property"
-          value={formData.property}
-          disabled={formData.category === "gluten-free"}
-          onChange={handleChange}
-        >
-          <option value="price">Price</option>
-          <option value="calories">Calories</option>
-          <option value="cpd">Calories / $</option>
-        </select>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <h2 className="pie-title" style={{ marginBottom: "16px" }}>
+        Top Five
+      </h2>
+      <form
+        action=""
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          columnGap: "16px",
+          marginBottom: "16px",
+        }}
+      >
+        {/* <label htmlFor="category">Category: </label> */}
+        <div>
+          <InputLabel id="category">Category</InputLabel>
+          <Select
+            name="category"
+            id="category"
+            value={formData.category}
+            onChange={handleChange}
+          >
+            <MenuItem value="all">All Items</MenuItem>
+            <MenuItem value="gluten-free">Gluten Free</MenuItem>
+            {Object.values(data).map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.id}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <InputLabel id="direction">Direction: </InputLabel>
+          <Select
+            name="direction"
+            id="direction"
+            value={`${formData.direction}`}
+            onChange={handleChange}
+            disabled={formData.category === "gluten-free"}
+          >
+            <MenuItem value="1">Highest</MenuItem>
+            <MenuItem value="-1">Lowest</MenuItem>
+          </Select>
+        </div>
+        <div>
+          <InputLabel id="property">Property: </InputLabel>
+          <Select
+            name="property"
+            id="property"
+            value={formData.property}
+            disabled={formData.category === "gluten-free"}
+            onChange={handleChange}
+          >
+            <MenuItem value="price">Price</MenuItem>
+            <MenuItem value="calories">Calories</MenuItem>
+            <MenuItem value="cpd">Calories / $</MenuItem>
+          </Select>
+        </div>
       </form>
-      <div>{formData.category === "all" ? "All Items" : formData.category}</div>
-      <TableContainer component={Paper}>
+
+      <TableContainer component={Paper} sx={{ height: "322px" }}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
               {formData.category === "gluten-free" ? (
                 <>
-                  <TableCell align="right">Price</TableCell>
-                  <TableCell align="right">Calories</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                    Price
+                  </TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                    Calories
+                  </TableCell>
                 </>
               ) : formData.property === "cpd" ? (
-                <TableCell align="right">Calories Per Dollar (CPD)</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                  Calories Per Dollar (CPD)
+                </TableCell>
               ) : (
-                <TableCell align="right">
+                <TableCell align="right" sx={{ fontWeight: "bold" }}>
                   {formData.property[0].toUpperCase() +
                     formData.property.slice(1)}
                 </TableCell>
               )}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody sx={{ overflowY: "scroll", maxHeight: "500px" }}>
             {sorted &&
               sorted.map((item) => (
                 <TableRow key={item.id}>
