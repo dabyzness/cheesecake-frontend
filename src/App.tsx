@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { ScatterPlot } from "./components/ScatterPlot";
+import { TopThree } from "./components/TopThree";
 import { TotalCalories } from "./components/TotalCalories";
 import {
   cheesecakeMenu,
@@ -170,7 +171,9 @@ function App() {
         )}
       </div>
 
-      <div className="chart-container"></div>
+      <div className="chart-container">
+        <TopThree data={formatScatterPlot(cheesecakeMenu)} />
+      </div>
     </div>
   );
 }
